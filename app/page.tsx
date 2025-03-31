@@ -1,103 +1,136 @@
-import Image from "next/image";
+import React from "react";
+import Link from "next/link";
+import { ArrowRight, Globe, Shield, MapPin, Bell, User } from "lucide-react";
+import { Suspense } from "react";
+import SafetyDashboard from "@/components/safety-dashboard";
+import DashboardSkeleton from "@/components/dashboard-skeleton";
 
 export default function Home() {
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+    <div className="min-h-screen w-full bg-gradient-to-br from-[#1a0d2c] to-[#0f051a]">
+      {/* Header */}
+      <header className="sticky top-0 z-50 w-full border-b border-purple-900/30 bg-purple-950/60 backdrop-blur supports-[backdrop-filter]:bg-purple-950/40">
+        <div className="container mx-auto flex h-16 items-center px-4">
+          <div className="flex items-center gap-2 font-bold text-xl text-white">
+            <Shield className="h-6 w-6 text-purple-400" />
+            <span>TravelSafe</span>
+          </div>
+          <nav className="ml-auto flex gap-6">
+            <Link
+              href="/"
+              className="text-sm font-medium text-white hover:text-purple-300 transition-colors"
+            >
+              Dashboard
+            </Link>
+            <Link
+              href="/map"
+              className="text-sm font-medium text-white/80 hover:text-purple-300 transition-colors"
+            >
+              Safety Map
+            </Link>
+            <Link
+              href="/alerts"
+              className="text-sm font-medium text-white/80 hover:text-purple-300 transition-colors"
+            >
+              Alerts
+            </Link>
+            <button className="flex items-center justify-center rounded-full bg-purple-900/30 p-2 text-white hover:bg-purple-800/50 transition-colors">
+              <User className="h-4 w-4" />
+            </button>
+          </nav>
+        </div>
+      </header>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+      {/* Hero Section */}
+      <main className="container mx-auto px-4 py-16">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          <div className="space-y-6">
+            <h1 className="text-4xl font-bold tracking-tight text-white sm:text-5xl">
+              Travel with confidence around the world
+            </h1>
+            <p className="text-xl text-purple-200/80">
+              Real-time safety alerts and travel advice for your global
+              adventures.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 pt-4">
+              <Link
+                href="/map"
+                className="inline-flex h-10 items-center justify-center rounded-md bg-purple-600 px-8 text-sm font-medium text-white shadow transition-colors hover:bg-purple-700 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-purple-400"
+              >
+                Explore Safety Map <ArrowRight className="ml-2 h-4 w-4" />
+              </Link>
+              <Link
+                href="/alerts"
+                className="inline-flex h-10 items-center justify-center rounded-md border border-purple-800 bg-transparent px-8 text-sm font-medium text-purple-200 shadow-sm transition-colors hover:bg-purple-900/30 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-purple-400"
+              >
+                View Alerts
+              </Link>
+            </div>
+          </div>
+          <div className="flex justify-center">
+            <div className="relative h-64 w-64 lg:h-80 lg:w-80">
+              <div
+                className="absolute inset-0 rounded-full bg-purple-700/20 animate-pulse"
+                style={{ animationDuration: "4s" }}
+              ></div>
+              <div
+                className="absolute inset-4 rounded-full bg-purple-600/20 animate-pulse"
+                style={{ animationDuration: "3s" }}
+              ></div>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <Globe className="h-32 w-32 text-purple-400" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <section className="w-full py-12 md:py-24 lg:py-32">
+          <div className="container px-4 md:px-6">
+            <div className="flex flex-col items-center justify-center space-y-4 text-center">
+              <div className="space-y-2">
+                <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
+                  Your Safety Dashboard
+                </h2>
+                <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
+                  Get real-time safety information for your destination
+                </p>
+              </div>
+            </div>
+            <Suspense fallback={<DashboardSkeleton />}>
+              <SafetyDashboard />
+            </Suspense>
+          </div>
+        </section>
+
+        {/* Features Section */}
+        <div className="mt-20 grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="rounded-lg border border-purple-900/50 bg-purple-950/30 p-6 hover:bg-purple-900/30 transition-colors">
+            <MapPin className="h-10 w-10 text-purple-400 mb-4" />
+            <h3 className="text-lg font-medium text-white mb-2">
+              Global Coverage
+            </h3>
+            <p className="text-purple-200/70">
+              Safety information for over 200 countries and regions worldwide.
+            </p>
+          </div>
+          <div className="rounded-lg border border-purple-900/50 bg-purple-950/30 p-6 hover:bg-purple-900/30 transition-colors">
+            <Bell className="h-10 w-10 text-purple-400 mb-4" />
+            <h3 className="text-lg font-medium text-white mb-2">
+              Real-time Alerts
+            </h3>
+            <p className="text-purple-200/70">
+              Instant notifications about safety concerns in your travel areas.
+            </p>
+          </div>
+          <div className="rounded-lg border border-purple-900/50 bg-purple-950/30 p-6 hover:bg-purple-900/30 transition-colors">
+            <Shield className="h-10 w-10 text-purple-400 mb-4" />
+            <h3 className="text-lg font-medium text-white mb-2">Safety Tips</h3>
+            <p className="text-purple-200/70">
+              Expert advice and recommendations for staying safe abroad.
+            </p>
+          </div>
         </div>
       </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
     </div>
   );
 }
