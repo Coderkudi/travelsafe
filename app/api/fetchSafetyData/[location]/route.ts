@@ -7,7 +7,7 @@ export async function GET(
     { params }: { params: { location: string } },
 ) {
     try {
-        const { location } = await params;
+        const { location } = params;
         if (location) {
             const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
             const prompt = `
