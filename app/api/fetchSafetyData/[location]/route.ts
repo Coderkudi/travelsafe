@@ -5,7 +5,7 @@ import { NextRequest, NextResponse } from "next/server";
 import * as React from "react";
 export async function GET(req: NextRequest, context: { params: { location: string } }) {
     try {
-        const { location } = await context.params;
+        const { location } = context.params;
         // const { location }: { location: string } = React.use(params);
         if (location) {
             const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
