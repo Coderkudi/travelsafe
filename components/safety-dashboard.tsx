@@ -1,5 +1,7 @@
 "use client";
 
+import type React from "react";
+
 import { useState, useEffect } from "react";
 import {
     Card,
@@ -22,10 +24,12 @@ import {
     Hospital,
     Phone,
     Search,
+    MapPin,
+    Shield,
 } from "lucide-react";
-import { toast, useToast } from "@/hooks/use-toast";
+import { toast } from "@/hooks/use-toast";
 import { useLazyFetchSafetyDataQuery } from "@/lib/user";
-import { SafetyDataType } from "@/types/SafetyData";
+import type { SafetyDataType } from "@/types/SafetyData";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export default function SafetyDashboard() {
@@ -71,13 +75,15 @@ export default function SafetyDashboard() {
     });
     const [loading, setLoading] = useState(false);
     const [locationInfo, { data, error, isLoading }] = useLazyFetchSafetyDataQuery();
-    const handleSearch = (e: any) => {
+    const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
         locationInfo(destination);
     };
+
     useEffect(() => {
         setLoading(isLoading);
         console.log(data, error, isLoading);
+        
         try {
             if (data) {
                 // @ts-ignore
@@ -93,13 +99,15 @@ export default function SafetyDashboard() {
             setLoading(isLoading);
         }
     }, [data, error, isLoading]);
+
     const getSafetyColor = (index: number) => {
-        if (index >= 80) return "text-green-500";
-        if (index >= 60) return "text-emerald-500";
-        if (index >= 40) return "text-amber-500";
-        if (index >= 20) return "text-orange-500";
-        return "text-red-500";
+        if (index >= 80) return "text-green-400";
+        if (index >= 60) return "text-emerald-400";
+        if (index >= 40) return "text-amber-400";
+        if (index >= 20) return "text-orange-400";
+        return "text-red-400";
     };
+
     const getAdvisoryBadge = (level: number) => {
         const levels: Record<
             number,
@@ -117,6 +125,7 @@ export default function SafetyDashboard() {
     };
 
     const advisoryBadge = getAdvisoryBadge(safetyData.advisoryLevel);
+
     return (
         <div className="w-full max-w-6xl mx-auto mt-8">
             <form
@@ -132,23 +141,26 @@ export default function SafetyDashboard() {
                         placeholder="Enter destination (city, country)"
                         value={destination}
                         onChange={(e) => setDestination(e.target.value)}
-                        className="w-full"
+                        className="w-full bg-purple-950/60 border-purple-800 placeholder:text-purple-300/50 text-white"
                     />
                 </div>
-                <Button type="submit" disabled={loading}>
+                <Button
+                    type="submit"
+                    disabled={loading}
+                    className="bg-purple-600 hover:bg-purple-700 text-white"
+                >
                     {loading ? "Loading..." : <Search className="h-4 w-4 mr-2" />}
                     Search
                 </Button>
             </form>
 
-            {/*  safety index , weather condition  */}
-            {/* weather api -> open api map .  */}
-            {/* fix theme from here */}
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 mb-8">
-                <Card>
+                <Card className="border-purple-900/50 bg-purple-950/30">
                     <CardHeader className="pb-2">
-                        <CardTitle className="text-2xl">Safety Index</CardTitle>
-                        <CardDescription>
+                        <CardTitle className="text-2xl text-white">
+                            Safety Index
+                        </CardTitle>
+                        <CardDescription className="text-purple-200/70">
                             Overall safety rating for {safetyData?.location as string}
                         </CardDescription>
                     </CardHeader>
@@ -158,7 +170,7 @@ export default function SafetyDashboard() {
                             <div className="relative h-40 w-40">
                                 <svg className="h-full w-full" viewBox="0 0 100 100">
                                     <circle
-                                        className="text-muted-foreground stroke-current"
+                                        className="text-purple-800/40 stroke-current"
                                         strokeWidth="10"
                                         fill="transparent"
                                         r="40"
@@ -191,7 +203,7 @@ export default function SafetyDashboard() {
                                         >
                                             {safetyData.safetyIndex}
                                         </p>
-                                        <p className="text-sm text-muted-foreground">
+                                        <p className="text-sm text-purple-300/70">
                                             out of 100
                                         </p>
                                     </div>
@@ -202,7 +214,7 @@ export default function SafetyDashboard() {
                     <CardFooter>
                         <Badge
                             variant={advisoryBadge.variant}
-                            className="w-full justify-center py-1.5"
+                            className="w-full justify-center py-1.5 bg-purple-800/50 text-white border-purple-700"
                         >
                             {advisoryBadge.label}
                         </Badge>
@@ -210,32 +222,32 @@ export default function SafetyDashboard() {
                 </Card>
 
                 {/* Weather card */}
-                <Card>
+                <Card className="border-purple-900/50 bg-purple-950/30">
                     <CardHeader className="pb-2">
-                        <CardTitle className="flex items-center gap-2">
-                            <CloudRain className="h-5 w-5" />
+                        <CardTitle className="flex items-center gap-2 text-white">
+                            <CloudRain className="h-5 w-5 text-purple-400" />
                             Weather Conditions
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
                         <div className="flex flex-col items-center py-4">
-                            <div className="text-5xl font-bold mb-2">
+                            <div className="text-5xl font-bold mb-2 text-white">
                                 {safetyData.weather.temperature}°C
                             </div>
-                            <div className="text-lg mb-4">
+                            <div className="text-lg mb-4 text-purple-200">
                                 {safetyData.weather.condition}
                             </div>
-                            <p className="text-sm text-muted-foreground text-center">
+                            <p className="text-sm text-purple-300/70 text-center">
                                 {safetyData.weather.forecast}
                             </p>
                         </div>
                     </CardContent>
                 </Card>
 
-                <Card>
+                <Card className="border-purple-900/50 bg-purple-950/30">
                     <CardHeader className="pb-2">
-                        <CardTitle className="flex items-center gap-2">
-                            <AlertCircle className="h-5 w-5" />
+                        <CardTitle className="flex items-center gap-2 text-white">
+                            <AlertCircle className="h-5 w-5 text-purple-400" />
                             Recent Incidents
                         </CardTitle>
                     </CardHeader>
@@ -244,14 +256,16 @@ export default function SafetyDashboard() {
                             {safetyData.recentIncidents.map((incident, i) => (
                                 <div
                                     key={i}
-                                    className="border-l-4 border-amber-500 pl-4 py-2"
+                                    className="border-l-4 border-purple-600 pl-4 py-2"
                                 >
-                                    <div className="font-medium">{incident.type}</div>
-                                    <div className="text-sm text-muted-foreground">
+                                    <div className="font-medium text-white">
+                                        {incident.type}
+                                    </div>
+                                    <div className="text-sm text-purple-300/70">
                                         {incident.location}
                                     </div>
-                                    <div className="text-sm mt-1">
-                                        {incident.description}normal
+                                    <div className="text-sm mt-1 text-purple-200">
+                                        {incident.description}
                                     </div>
                                 </div>
                             ))}
@@ -259,70 +273,95 @@ export default function SafetyDashboard() {
                     </CardContent>
                 </Card>
             </div>
+
             <Tabs defaultValue="health" className="w-full">
-                <TabsList className="grid w-full grid-cols-3">
-                    <TabsTrigger value="health">Health Advisories</TabsTrigger>
-                    <TabsTrigger value="emergency">Emergency Contacts</TabsTrigger>
-                    <TabsTrigger value="tips">Safety Tips</TabsTrigger>
+                <TabsList className="grid w-full grid-cols-3 bg-purple-900/30">
+                    <TabsTrigger
+                        value="health"
+                        className="data-[state=active]:bg-purple-800 data-[state=active]:text-white text-purple-200"
+                    >
+                        Health Advisories
+                    </TabsTrigger>
+                    <TabsTrigger
+                        value="emergency"
+                        className="data-[state=active]:bg-purple-800 data-[state=active]:text-white text-purple-200"
+                    >
+                        Emergency Contacts
+                    </TabsTrigger>
+                    <TabsTrigger
+                        value="tips"
+                        className="data-[state=active]:bg-purple-800 data-[state=active]:text-white text-purple-200"
+                    >
+                        Safety Tips
+                    </TabsTrigger>
                 </TabsList>
+
                 <TabsContent value="health" className="space-y-4 mt-6">
-                    <Alert>
-                        <AlertTriangle className="h-4 w-4" />
+                    <Alert className="bg-purple-900/30 border-purple-700 text-white">
+                        <AlertTriangle className="h-4 w-4 text-purple-400" />
                         <AlertTitle>Health Information</AlertTitle>
-                        <AlertDescription>
+                        <AlertDescription className="text-purple-200">
                             Current health advisories for {safetyData.location}
                         </AlertDescription>
                     </Alert>
                     <div className="space-y-2">
                         {safetyData.healthAdvisories.map((advisory, i) => (
-                            <div key={i} className="p-4 border rounded-lg">
+                            <div
+                                key={i}
+                                className="p-4 border border-purple-900/50 bg-purple-950/30 rounded-lg text-purple-200"
+                            >
                                 <p>{advisory}</p>
                             </div>
                         ))}
                     </div>
                 </TabsContent>
+
                 <TabsContent value="emergency" className="mt-6">
                     <div className="grid gap-4 md:grid-cols-2">
-                        <Card>
+                        <Card className="border-purple-900/50 bg-purple-950/30">
                             <CardHeader>
-                                <CardTitle className="flex items-center gap-2">
-                                    <Phone className="h-5 w-5 text-primary" />
+                                <CardTitle className="flex items-center gap-2 text-white">
+                                    <Phone className="h-5 w-5 text-purple-400" />
                                     Emergency Numbers
                                 </CardTitle>
                             </CardHeader>
                             <CardContent>
                                 <div className="space-y-2">
-                                    <div className="flex justify-between">
+                                    <div className="flex justify-between text-purple-200">
                                         <span>Police:</span>
-                                        <span className="font-bold">
+                                        <span className="font-bold text-white">
                                             {safetyData.emergencyContacts.police}
                                         </span>
                                     </div>
-                                    <div className="flex justify-between">
+                                    <div className="flex justify-between text-purple-200">
                                         <span>Ambulance:</span>
-                                        <span className="font-bold">
+                                        <span className="font-bold text-white">
                                             {safetyData.emergencyContacts.ambulance}
                                         </span>
                                     </div>
-                                    <div className="flex justify-between">
+                                    <div className="flex justify-between text-purple-200">
                                         <span>Fire Service:</span>
-                                        <span className="font-bold">
+                                        <span className="font-bold text-white">
                                             {safetyData.emergencyContacts.fireService}
                                         </span>
                                     </div>
-                                    <div className="flex justify-between">
+                                    <div className="flex justify-between text-purple-200">
                                         <span>Emergency Hotline:</span>
-                                        <span className="font-bold">
-                                            {safetyData.emergencyContacts.emergencyHotline}
+                                        <span className="font-bold text-white">
+                                            {
+                                                safetyData.emergencyContacts
+                                                    .emergencyHotline
+                                            }
                                         </span>
                                     </div>
                                 </div>
                             </CardContent>
                         </Card>
-                        <Card>
+
+                        <Card className="border-purple-900/50 bg-purple-950/30">
                             <CardHeader>
-                                <CardTitle className="flex items-center gap-2">
-                                    <Hospital className="h-5 w-5 text-primary" />
+                                <CardTitle className="flex items-center gap-2 text-white">
+                                    <Hospital className="h-5 w-5 text-purple-400" />
                                     Nearby Hospitals
                                 </CardTitle>
                             </CardHeader>
@@ -334,14 +373,19 @@ export default function SafetyDashboard() {
                                             className="flex justify-between items-center"
                                         >
                                             <div>
-                                                <div className="font-medium">
+                                                <div className="font-medium text-white">
                                                     {hospital.name}
                                                 </div>
-                                                <div className="text-sm text-muted-foreground">
+                                                <div className="text-sm text-purple-300/70">
                                                     {hospital.distance}
                                                 </div>
                                             </div>
-                                            <Button variant="outline" size="sm">
+                                            <Button
+                                                variant="outline"
+                                                size="sm"
+                                                className="border-purple-700 text-purple-200 hover:bg-purple-800 hover:text-white"
+                                            >
+                                                <MapPin className="h-3 w-3 mr-1" />{" "}
                                                 Directions
                                             </Button>
                                         </div>
@@ -351,14 +395,17 @@ export default function SafetyDashboard() {
                         </Card>
                     </div>
                 </TabsContent>
+
                 <TabsContent value="tips" className="space-y-4 mt-6">
                     <div className="grid gap-4 md:grid-cols-2">
-                        <Card>
+                        <Card className="border-purple-900/50 bg-purple-950/30">
                             <CardHeader>
-                                <CardTitle>General Safety Tips</CardTitle>
+                                <CardTitle className="text-white">
+                                    General Safety Tips
+                                </CardTitle>
                             </CardHeader>
                             <CardContent>
-                                <ul className="space-y-2 list-disc pl-5">
+                                <ul className="space-y-2 list-disc pl-5 text-purple-200">
                                     <li>Keep your valuables secure and out of sight</li>
                                     <li>
                                         Stay aware of your surroundings, especially in
@@ -370,12 +417,16 @@ export default function SafetyDashboard() {
                                 </ul>
                             </CardContent>
                         </Card>
-                        <Card>
+
+                        <Card className="border-purple-900/50 bg-purple-950/30">
                             <CardHeader>
-                                <CardTitle>Location-Specific Advice</CardTitle>
+                                <CardTitle className="flex items-center gap-2 text-white">
+                                    <Shield className="h-5 w-5 text-purple-400" />
+                                    Location-Specific Advice
+                                </CardTitle>
                             </CardHeader>
                             <CardContent>
-                                <ul className="space-y-2 list-disc pl-5">
+                                <ul className="space-y-2 list-disc pl-5 text-purple-200">
                                     <li>Be cautious of pickpockets in tourist areas</li>
                                     <li>Avoid demonstrations and political gatherings</li>
                                     <li>
