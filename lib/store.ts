@@ -36,7 +36,7 @@ import { useSelector } from "react-redux";
 //     }
 //     return next(action);
 // };
-export const store = configureStore({
+export const Store = configureStore({
     reducer: {
         [userApi.reducerPath]: userApi.reducer,
         userInformation: userInformationReducer,
@@ -47,6 +47,5 @@ export const store = configureStore({
 
     devTools: true,
 });
-
-setupListeners(store.dispatch);
+setupListeners(Store.dispatch);
 // (getDefaultMiddleware) =>getDefaultMiddleware().concat(userApi.middleware),

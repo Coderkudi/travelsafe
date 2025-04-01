@@ -30,7 +30,7 @@ export const userApi = createApi({
         //     } catch (error: any) {}
         // },
     }),
-    tagTypes: ["globalTypes", "refresh", "category", "groups"],
+    tagTypes: ["globalTypes", "refresh"],
     endpoints: (builder) => ({
         signup: builder.mutation({
             query: (Credentials) => ({
@@ -41,23 +41,23 @@ export const userApi = createApi({
         }),
         fetchSafetyData: builder.query({
             query: (location: string) => ({
-                url: `/fetchSafetyData/${location}`,
+                url: `/api/fetchSafetyData/${location}`,
                 method: "GET",
             }),
         }),
 
-        getTransaction: builder.query({
-            query: (groupId) => ({
-                url: `/getTransaction/${groupId}`,
-                method: "GET",
-            }),
-            providesTags: ["globalTypes", "refresh"],
-        }),
+        // getTransaction: builder.query({
+        //     query: (groupId) => ({
+        //         url: `/getTransaction/${groupId}`,
+        //         method: "GET",
+        //     }),
+        //     providesTags: ["globalTypes", "refresh"],
+        // }),
     }),
 });
 
 export const {
     useSignupMutation,
-    useLazyGetTransactionQuery,
+    // useLazyGetTransactionQuery,
     useLazyFetchSafetyDataQuery,
 } = userApi;

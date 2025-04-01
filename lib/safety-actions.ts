@@ -54,7 +54,7 @@
 //   }
 // }
 
-// // Use AI to generate personalized safety tips
+// // Use AI to generate personalized safety tip
 // async function generateAISafetyTips(location: string) {
 //   try {
 //     const { text } = await generateText({

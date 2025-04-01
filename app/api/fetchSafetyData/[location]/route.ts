@@ -57,17 +57,27 @@ Format the response as a JSON object with the following structure:
 }
   Note: All news and weather condition should be realtime only`;
             const result: GenerateContentResult = await model.generateContent([prompt]);
-            console.log("result", result.response.text());
-            // const formatedResult = JSON.parse(result.response.text());
-            // console.log("formatedResult", formatedResult);
             if (result) {
-                return NextResponse.json(result.response.text(), {
-                    status: 200,
-                });
+                try {
+                    const jsonMatch = result.response.text().match(/\{[\s\S]*\}/);
+                    const jsonString = jsonMatch ? jsonMatch[0] : null;
+                    let jsonObject;
+                    jsonObject = JSON.parse(jsonString as string);
+                    return NextResponse.json(jsonObject, {
+                        status: 200,
+                    });
+                } catch (error) {
+                    if (error instanceof Error) {
+                        console.log(error.message);
+
+                        return NextResponse.json("Got request but no location", {
+                            status: 400,
+                        });
+                    }
+                }
             }
-            return NextResponse.json("Got request but no location", { status: 400 });
-        }
-        {
+            return NextResponse.json("Error getting ai Reponse", { status: 400 });
+        } else {
             return NextResponse.json("Got request but no location", { status: 400 });
         }
     } catch (e) {
