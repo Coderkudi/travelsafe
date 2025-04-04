@@ -282,7 +282,7 @@ export default function SafetyMapPage() {
                                     )}
                                 </Map>
                                 {/* Map controls */}
-                                <div className="absolute bottom-4 right-4 flex flex-col gap-2">
+                                <div className="absolute bottom-4 right-4 sm:flex flex-col gap-2  hidden ">
                                     <Card className="w-auto border-purple-900/50 bg-purple-950/60 backdrop-blur">
                                         <CardContent className="p-2">
                                             <div className="flex flex-col gap-1">
@@ -372,6 +372,66 @@ export default function SafetyMapPage() {
                                 </div>
                             </CardContent>
                         </Card>
+                        <div className=" lg:flex flex-col gap-2 z-10 hidden md:flex ">
+                            <Card className="w-auto border-purple-900/50 bg-purple-950/60 backdrop-blur">
+                                <CardContent className="p-2">
+                                    <div className="flex flex-col gap-1">
+                                        <Button
+                                            variant={
+                                                activeLayer === "all"
+                                                    ? "default"
+                                                    : "outline"
+                                            }
+                                            size="sm"
+                                            className="justify-start"
+                                            onClick={() => setActiveLayer("all")}
+                                        >
+                                            <Layers className="h-4 w-4 mr-2" />
+                                            All Layers
+                                        </Button>
+                                        <Button
+                                            variant={
+                                                activeLayer === "safety"
+                                                    ? "default"
+                                                    : "outline"
+                                            }
+                                            size="sm"
+                                            className="justify-start"
+                                            onClick={() => setActiveLayer("safety")}
+                                        >
+                                            <Shield className="h-4 w-4 mr-2" />
+                                            Safety Alerts
+                                        </Button>
+                                        <Button
+                                            variant={
+                                                activeLayer === "incidents"
+                                                    ? "default"
+                                                    : "outline"
+                                            }
+                                            size="sm"
+                                            className="justify-start"
+                                            onClick={() => setActiveLayer("incidents")}
+                                        >
+                                            <AlertTriangle className="h-4 w-4 mr-2" />
+                                            Recent Incidents
+                                        </Button>
+                                        <Button
+                                            variant={
+                                                activeLayer === "services"
+                                                    ? "default"
+                                                    : "outline"
+                                            }
+                                            size="sm"
+                                            className="justify-start"
+                                            onClick={() => setActiveLayer("services")}
+                                        >
+                                            <Hospital className="h-4 w-4 mr-2" />
+                                            Emergency Services
+                                        </Button>
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        </div>
 
                         <Card className="border-purple-900/50 bg-purple-950/30">
                             <CardContent className="p-4">
