@@ -29,3 +29,41 @@ export interface SafetyDataType {
 
     aiGeneratedTips: string;
 }
+
+export interface safetyScore {
+    publicSafety: {
+        crimeRate: number;
+        emergencyResponse: number;
+        policePresence: number;
+        NeighborhoodSafety: number;
+        NighttimeSafety: number;
+    };
+    healthSafety: {
+        airQuality: number;
+        waterQuality: number;
+        foodHygiene: number;
+        accessToHealthcare: number;
+        diseasePrevalence: number;
+    };
+    natureRisk: {
+        naturalDisasters: number;
+        wildlifeEncounters: number;
+        environmentalHazards: number;
+        climateChangeImpact: number;
+        uvIndex: number;
+    };
+    CultureAndLegalAwareness: {
+        lawsAndRegulations: number;
+        culturalNorms: number;
+        localCustoms: number;
+        languageBarrier: number;
+        legalAssistance: number;
+    };
+    techSafety: {
+        dataPrivacy: number;
+        cyberSecurity: number;
+        digitalFraud: number;
+        onlineHarassment: number;
+        techSupport: number;
+    };
+}
