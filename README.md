@@ -1,36 +1,39 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# TravelSafe
 
-## Getting Started
+TravelSafe is a comprehensive travel safety application designed to provide real-time safety information, alerts, and advice for travelers worldwide. With features like interactive maps, safety dashboards, and emergency contact details, TravelSafe ensures you can travel with confidence and stay informed about your destination.
 
-First, run the development server:
+---
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Features
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 🌍 **Global Coverage**
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+-   Safety information for over 200 countries and regions worldwide.
+-   Real-time updates on safety metrics, weather conditions, and travel advisories.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 🗺️ **Interactive Safety Map**
 
-## Learn More
+-   View safety alerts, recent incidents, and nearby medical facilities on an interactive map.
+-   Filter map layers by safety alerts, incidents, or emergency services.
+-   Search for specific destinations and get detailed safety information.
 
-To learn more about Next.js, take a look at the following resources:
+### 📊 **Safety Dashboard**
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+-   Comprehensive safety index for your destination.
+-   Detailed breakdown of public safety, health safety, nature risks, and more.
+-   Recent incidents and health advisories for your location.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### 🚨 **Emergency Contacts**
 
-## Deploy on Vercel
+-   Quick access to emergency numbers for police, ambulance, fire services, and hotlines.
+-   Nearby hospitals and medical facilities with directions.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### 🌦️ **Weather Updates**
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+-   Real-time weather conditions and forecasts for your destination.
+-   Alerts for extreme weather or environmental hazards.
+
+### 💡 **Safety Tips**
+
+-   AI-generated travel safety tips tailored to your destination.
+-   Location-specific advice to help you stay safe.
