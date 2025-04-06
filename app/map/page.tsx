@@ -4,8 +4,6 @@ import type React from "react";
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Search, Layers, AlertTriangle, Hospital, Shield } from "lucide-react";
 import dynamic from "next/dynamic";
 
@@ -18,22 +16,20 @@ const Map = dynamic(() => import("../../components/Map"), {
         </div>
     ),
 });
+
 import { toast } from "@/hooks/use-toast";
 import { useSelector } from "react-redux";
-import { selectLocationState, selectsafetyData } from "@/lib/userSlice";
+import {
+    selectAllLandMarks,
+    selectLocationState,
+    selectsafetyData,
+} from "@/lib/userSlice";
 import SearchBox from "@/components/ui/searchBox";
-import { SafetyDataType } from "@/types/SafetyData";
+import { Landmark, SafetyDataType } from "@/types/SafetyData";
+import { useLazyFetchLandmarksQuery } from "@/lib/user";
 
 // Default coordinates for Paris, France
 const DEFAULT_CENTER: [number, number] = [48.8566, 2.3522];
-
-interface Landmark {
-    id: string;
-    name: string;
-    location: [number, number];
-    type: "safety" | "hospital" | "incident";
-    description?: string;
-}
 
 export default function SafetyMapPage() {
     const safetyDataFromRedux: SafetyDataType = useSelector(selectsafetyData);
@@ -50,139 +46,57 @@ export default function SafetyMapPage() {
     );
     const [zoom, setZoom] = useState(12);
     const mapRef = useRef<any>(null);
-    const [landmarks, setLandmarks] = useState<Landmark[]>([
-        {
-            id: "landmark-1",
-            name: "Tourist Area - Exercise Caution",
-            location: [48.8584, 2.2945], // Eiffel Tower area
-            type: "safety",
-            description: "Pickpocketing reported in this tourist area",
-        },
-        {
-            id: "landmark-2",
-            name: "Hôpital Hôtel-Dieu",
-            location: [48.8539, 2.3485], // Near Notre Dame
-            type: "hospital",
-            description: "Emergency medical services available 24/7",
-        },
-        {
-            id: "landmark-3",
-            name: "Recent Protest",
-            location: [48.8738, 2.295], // Arc de Triomphe
-            type: "incident",
-            description: "Scheduled demonstration on Saturday",
-        },
-    ]);
+    const allLandMarks = useSelector(selectAllLandMarks);
+
+    // Update landmarks when redux data changes
     useEffect(() => {
-        setDestination(safetyDataFromRedux.location);
-        setMapCenter([
-            safetyDataFromRedux.coordinates.lat,
-            safetyDataFromRedux.coordinates.lon,
-        ]);
-    }, [safetyDataFromRedux]);
-
-    const handleSearch = async (e: React.FormEvent) => {
-        e.preventDefault();
-
-        try {
-            // In a real app, this would use a geocoding service
-            // For demo purposes, we'll use some predefined locations
-            if (destination.toLowerCase().includes("paris")) {
-                setMapCenter([48.8566, 2.3522]);
-                // Update landmarks for Paris
-                setLandmarks([
-                    {
-                        id: "paris-1",
-                        name: "Tourist Area - Exercise Caution",
-                        location: [48.8584, 2.2945], // Eiffel Tower area
-                        type: "safety",
-                        description: "Pickpocketing reported in this tourist area",
-                    },
-                    {
-                        id: "paris-2",
-                        name: "Hôpital Hôtel-Dieu",
-                        location: [48.8539, 2.3485], // Near Notre Dame
-                        type: "hospital",
-                        description: "Emergency medical services available 24/7",
-                    },
-                    {
-                        id: "paris-3",
-                        name: "Recent Protest",
-                        location: [48.8738, 2.295], // Arc de Triomphe
-                        type: "incident",
-                        description: "Scheduled demonstration on Saturday",
-                    },
-                ]);
-            } else if (destination.toLowerCase().includes("london")) {
-                setMapCenter([51.5074, -0.1278]);
-                // Update landmarks for London
-                setLandmarks([
-                    {
-                        id: "london-1",
-                        name: "Tourist Area - Exercise Caution",
-                        location: [51.5081, -0.0759], // Tower of London
-                        type: "safety",
-                        description: "Crowded area, be aware of your surroundings",
-                    },
-                    {
-                        id: "london-2",
-                        name: "St Thomas' Hospital",
-                        location: [51.4987, -0.1175], // Near London Eye
-                        type: "hospital",
-                        description: "Major trauma center and emergency services",
-                    },
-                    {
-                        id: "london-3",
-                        name: "Planned Strike",
-                        location: [51.5074, -0.1278], // Central London
-                        type: "incident",
-                        description: "Transport workers strike planned for Friday",
-                    },
-                ]);
-            } else if (destination.toLowerCase().includes("new york")) {
-                setMapCenter([40.7128, -74.006]);
-                // Update landmarks for New York
-                setLandmarks([
-                    {
-                        id: "nyc-1",
-                        name: "High Alert Area",
-                        location: [40.758, -73.9855], // Times Square
-                        type: "safety",
-                        description: "Crowded tourist area, stay vigilant",
-                    },
-                    {
-                        id: "nyc-2",
-                        name: "NYU Langone Medical Center",
-                        location: [40.7421, -73.974], // East side
-                        type: "hospital",
-                        description: "Full emergency services available",
-                    },
-                    {
-                        id: "nyc-3",
-                        name: "Construction Zone",
-                        location: [40.7112, -74.0134], // Financial District
-                        type: "incident",
-                        description: "Major construction causing traffic disruptions",
-                    },
-                ]);
-            } else {
-                toast({
-                    title: "Location not found",
-                    description:
-                        "Try searching for Paris, London, or New York for this demo",
-                    variant: "destructive",
-                });
-            }
-
-            setZoom(12); // Reset zoom level for new location
-        } catch (error) {
-            toast({
-                title: "Error finding location",
-                description: "Please try a different location or check your spelling",
-                variant: "destructive",
-            });
+        if (allLandMarks && allLandMarks.length > 0) {
+            setLandmarks(allLandMarks);
         }
-    };
+    }, [allLandMarks]);
+
+    // Default landmarks if none are provided from Redux
+    const [landmarks, setLandmarks] = useState<Landmark[]>(
+        allLandMarks && allLandMarks.length > 0
+            ? allLandMarks
+            : [
+                  {
+                      id: "landmark-1",
+                      name: "Tourist Area - Exercise Caution",
+                      location: [48.8584, 2.2945], // Eiffel Tower area
+                      type: "safety",
+                      description: "Pickpocketing reported in this tourist area",
+                  },
+                  {
+                      id: "landmark-2",
+                      name: "Hôpital Hôtel-Dieu",
+                      location: [48.8539, 2.3485], // Near Notre Dame
+                      type: "hospital",
+                      description: "Emergency medical services available 24/7",
+                  },
+                  {
+                      id: "landmark-3",
+                      name: "Recent Protest",
+                      location: [48.8738, 2.295], // Arc de Triomphe
+                      type: "incident",
+                      description: "Scheduled demonstration on Saturday",
+                  },
+              ],
+    );
+
+    // Update map center when safety data changes
+    useEffect(() => {
+        if (
+            safetyDataFromRedux.coordinates.lat !== 0 &&
+            safetyDataFromRedux.coordinates.lon !== 0
+        ) {
+            setDestination(safetyDataFromRedux.location);
+            setMapCenter([
+                safetyDataFromRedux.coordinates.lat,
+                safetyDataFromRedux.coordinates.lon,
+            ]);
+        }
+    }, [safetyDataFromRedux]);
 
     // Filter landmarks based on active layer
     const getVisibleLandmarks = () => {
@@ -195,6 +109,7 @@ export default function SafetyMapPage() {
         return landmarks;
     };
 
+    // Get marker icon based on landmark type
     const getMarkerIcon = (type: string, Leaflet: any) => {
         const iconSize = [25, 41];
         const iconAnchor = [12, 41];
@@ -223,11 +138,7 @@ export default function SafetyMapPage() {
         });
     };
 
-    useEffect(() => {
-        if (mapRef.current) {
-            mapRef.current = mapRef.current.leafletElement;
-        }
-    }, []);
+    // Update map view when center or zoom changes
     useEffect(() => {
         if (mapRef.current) {
             mapRef.current.setView(mapCenter, zoom);
@@ -253,114 +164,108 @@ export default function SafetyMapPage() {
                 <div className="grid gap-6 lg:grid-cols-[1fr_300px] mt-6">
                     <Card className="overflow-hidden border-purple-900/50 bg-purple-950/30">
                         <div className="relative w-full h-[70vh]">
-                            {/* map loading */}
-                            <>
-                                <Map
-                                    center={mapCenter}
-                                    zoom={zoom}
-                                    height={600}
-                                    whenCreated={(mapInstance: any) =>
-                                        (mapRef.current = mapInstance)
-                                    }
-                                >
-                                    {(ReactLeaflet: any, Leaflet: any) => {
-                                        const { TileLayer, Marker, Popup } = ReactLeaflet;
-                                        return (
-                                            <>
-                                                <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-                                                {getVisibleLandmarks().map((landmark) => (
-                                                    <Marker
-                                                        key={landmark.id}
-                                                        position={landmark.location}
-                                                        icon={getMarkerIcon(
-                                                            landmark.type,
-                                                            Leaflet,
-                                                        )}
-                                                    >
-                                                        <Popup>
-                                                            <div>
-                                                                <h3 className="font-bold">
-                                                                    {landmark.name}
-                                                                </h3>
-                                                                <p>
-                                                                    {landmark.description}
-                                                                </p>
-                                                            </div>
-                                                        </Popup>
-                                                    </Marker>
-                                                ))}
-                                            </>
-                                        );
-                                    }}
-                                </Map>
-                                {/* Map controls */}
-                                <div className="absolute bottom-4 right-4 sm:flex flex-col gap-2  hidden ">
-                                    <Card className="w-auto border-purple-900/50 bg-purple-950/60 backdrop-blur">
-                                        <CardContent className="p-2">
-                                            <div className="flex flex-col gap-1">
-                                                <Button
-                                                    variant={
-                                                        activeLayer === "all"
-                                                            ? "default"
-                                                            : "outline"
-                                                    }
-                                                    size="sm"
-                                                    className="justify-start"
-                                                    onClick={() => setActiveLayer("all")}
+                            <Map
+                                center={mapCenter}
+                                zoom={zoom}
+                                height={600}
+                                whenCreated={(mapInstance: any) => {
+                                    mapRef.current = mapInstance;
+                                }}
+                            >
+                                {(ReactLeaflet: any, Leaflet: any) => {
+                                    const { TileLayer, Marker, Popup } = ReactLeaflet;
+                                    return (
+                                        <>
+                                            <TileLayer
+                                                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                                                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                                            />
+                                            {getVisibleLandmarks().map((landmark) => (
+                                                <Marker
+                                                    key={landmark.id}
+                                                    position={landmark.location}
+                                                    icon={getMarkerIcon(
+                                                        landmark.type,
+                                                        Leaflet,
+                                                    )}
                                                 >
-                                                    <Layers className="h-4 w-4 mr-2" />
-                                                    All Layers
-                                                </Button>
-                                                <Button
-                                                    variant={
-                                                        activeLayer === "safety"
-                                                            ? "default"
-                                                            : "outline"
-                                                    }
-                                                    size="sm"
-                                                    className="justify-start"
-                                                    onClick={() =>
-                                                        setActiveLayer("safety")
-                                                    }
-                                                >
-                                                    <Shield className="h-4 w-4 mr-2" />
-                                                    Safety Alerts
-                                                </Button>
-                                                <Button
-                                                    variant={
-                                                        activeLayer === "incidents"
-                                                            ? "default"
-                                                            : "outline"
-                                                    }
-                                                    size="sm"
-                                                    className="justify-start"
-                                                    onClick={() =>
-                                                        setActiveLayer("incidents")
-                                                    }
-                                                >
-                                                    <AlertTriangle className="h-4 w-4 mr-2" />
-                                                    Recent Incidents
-                                                </Button>
-                                                <Button
-                                                    variant={
-                                                        activeLayer === "services"
-                                                            ? "default"
-                                                            : "outline"
-                                                    }
-                                                    size="sm"
-                                                    className="justify-start"
-                                                    onClick={() =>
-                                                        setActiveLayer("services")
-                                                    }
-                                                >
-                                                    <Hospital className="h-4 w-4 mr-2" />
-                                                    Emergency Services
-                                                </Button>
-                                            </div>
-                                        </CardContent>
-                                    </Card>
-                                </div>
-                            </>
+                                                    <Popup>
+                                                        <div>
+                                                            <h3 className="font-bold">
+                                                                {landmark.name}
+                                                            </h3>
+                                                            <p>{landmark.description}</p>
+                                                        </div>
+                                                    </Popup>
+                                                </Marker>
+                                            ))}
+                                        </>
+                                    );
+                                }}
+                            </Map>
+                            {/* Map controls */}
+                            <div className="absolute bottom-4 right-4 sm:flex flex-col gap-2 hidden">
+                                <Card className="w-auto border-purple-900/50 bg-purple-950/60 backdrop-blur">
+                                    <CardContent className="p-2">
+                                        <div className="flex flex-col gap-1">
+                                            <Button
+                                                variant={
+                                                    activeLayer === "all"
+                                                        ? "default"
+                                                        : "outline"
+                                                }
+                                                size="sm"
+                                                className="justify-start"
+                                                onClick={() => setActiveLayer("all")}
+                                            >
+                                                <Layers className="h-4 w-4 mr-2" />
+                                                All Layers
+                                            </Button>
+                                            <Button
+                                                variant={
+                                                    activeLayer === "safety"
+                                                        ? "default"
+                                                        : "outline"
+                                                }
+                                                size="sm"
+                                                className="justify-start"
+                                                onClick={() => setActiveLayer("safety")}
+                                            >
+                                                <Shield className="h-4 w-4 mr-2" />
+                                                Safety Alerts
+                                            </Button>
+                                            <Button
+                                                variant={
+                                                    activeLayer === "incidents"
+                                                        ? "default"
+                                                        : "outline"
+                                                }
+                                                size="sm"
+                                                className="justify-start"
+                                                onClick={() =>
+                                                    setActiveLayer("incidents")
+                                                }
+                                            >
+                                                <AlertTriangle className="h-4 w-4 mr-2" />
+                                                Recent Incidents
+                                            </Button>
+                                            <Button
+                                                variant={
+                                                    activeLayer === "services"
+                                                        ? "default"
+                                                        : "outline"
+                                                }
+                                                size="sm"
+                                                className="justify-start"
+                                                onClick={() => setActiveLayer("services")}
+                                            >
+                                                <Hospital className="h-4 w-4 mr-2" />
+                                                Emergency Services
+                                            </Button>
+                                        </div>
+                                    </CardContent>
+                                </Card>
+                            </div>
                         </div>
                     </Card>
 
@@ -384,7 +289,7 @@ export default function SafetyMapPage() {
                                 </div>
                             </CardContent>
                         </Card>
-                        <div className=" lg:flex flex-col gap-2 z-10 hidden md:flex ">
+                        <div className="lg:flex flex-col gap-2 z-10 hidden md:flex">
                             <Card className="w-auto border-purple-900/50 bg-purple-950/60 backdrop-blur">
                                 <CardContent className="p-2">
                                     <div className="flex flex-col gap-1">
@@ -453,7 +358,7 @@ export default function SafetyMapPage() {
                                 <p className="text-sm text-purple-200 mb-3">
                                     Current safety information for {destination}
                                 </p>
-                                <div className="space-y-2">
+                                <div className="space-y-2 max-h-[300px] overflow-y-auto overflow-x-hidden pr-1">
                                     {landmarks.map((landmark) => (
                                         <div
                                             key={landmark.id}

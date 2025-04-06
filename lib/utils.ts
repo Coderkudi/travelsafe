@@ -37,7 +37,7 @@ export async function getWeather(location: string) {
                 lon: json.coord.lon,
             },
         };
-        console.log("Weather", weather);
+
         return weather;
     } catch (err) {
         if (err instanceof Error) {

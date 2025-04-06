@@ -30,7 +30,6 @@ export interface SafetyDataType {
         name: string;
         distance: string;
     }[];
-
     aiGeneratedTips: string;
 }
 
@@ -70,4 +69,12 @@ export interface safetyScore {
         onlineHarassment: number;
         techSupport: number;
     };
+}
+
+export interface Landmark {
+    id: string;
+    name: string;
+    location: [number, number];
+    type: "safety" | "hospital" | "incident";
+    description?: string;
 }

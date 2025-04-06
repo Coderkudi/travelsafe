@@ -1,21 +1,13 @@
-import { SafetyDataType } from "@/types/SafetyData";
+import { Landmark, SafetyDataType } from "@/types/SafetyData";
 import { createSelector, createSlice } from "@reduxjs/toolkit";
 interface StateInterface {
     locationSearchBoxText: string;
-    location: {
-        name: string | null;
-        lat: number;
-        lon: number;
-    };
+    landmarks: Landmark[];
     safetyData: SafetyDataType;
 }
 const initialState: StateInterface = {
     locationSearchBoxText: "paris,france",
-    location: {
-        name: null,
-        lat: 0,
-        lon: 0,
-    },
+    landmarks: [],
     safetyData: {
         location: "Paris, France",
         coordinates: {
@@ -65,14 +57,6 @@ const locationData = createSlice({
     name: "locationInformation",
     initialState,
     reducers: {
-        setLocationInformation: (
-            state: StateInterface,
-            action: {
-                payload: Pick<StateInterface, "location">;
-            },
-        ) => {
-            state.location = action.payload.location;
-        },
         setLocationSearchBoxText: (
             state: StateInterface,
             action: {
@@ -89,10 +73,19 @@ const locationData = createSlice({
         ) => {
             state.safetyData = action.payload.safetyData;
         },
+        setLandmarks: (
+            state: StateInterface,
+            action: {
+                payload: Pick<StateInterface, "landmarks">;
+            },
+        ) => {
+            console.log("landmarks", action.payload.landmarks);
+            state.landmarks = action.payload.landmarks;
+        },
     },
 });
 
-export const { setLocationInformation } = locationData.actions;
+export const { setLocationSearchBoxText, setSafetyData } = locationData.actions;
 export default locationData.reducer;
 
 export const selectLocationState = (state: any) => state.locationInformation;
@@ -100,11 +93,12 @@ export const selectLocationSearchBoxText = createSelector(
     selectLocationState,
     (state: StateInterface) => state.locationSearchBoxText,
 );
-export const selectLocation = createSelector(
-    selectLocationState,
-    (state: StateInterface) => state.location,
-);
+
 export const selectsafetyData = createSelector(
     selectLocationState,
     (state: StateInterface) => state.safetyData,
+);
+export const selectAllLandMarks = createSelector(
+    selectLocationState,
+    (state: StateInterface) => state.landmarks,
 );

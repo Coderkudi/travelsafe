@@ -45,6 +45,12 @@ export const userApi = createApi({
                 method: "GET",
             }),
         }),
+        fetchLandmarks: builder.query({
+            query: (location: string) => ({
+                url: `/api/landMarks/${location}`,
+                method: "GET",
+            }),
+        }),
 
         // getTransaction: builder.query({
         //     query: (groupId) => ({
@@ -58,6 +64,6 @@ export const userApi = createApi({
 
 export const {
     useSignupMutation,
-    // useLazyGetTransactionQuery,
+    useLazyFetchLandmarksQuery,
     useLazyFetchSafetyDataQuery,
 } = userApi;

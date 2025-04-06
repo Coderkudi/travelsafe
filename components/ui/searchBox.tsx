@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
-import { useLazyFetchSafetyDataQuery } from "@/lib/user";
+import { useLazyFetchLandmarksQuery, useLazyFetchSafetyDataQuery } from "@/lib/user";
 import { useDispatch, useSelector } from "react-redux";
 import { selectLocationState, selectsafetyData } from "@/lib/userSlice";
 import { SafetyDataType } from "@/types/SafetyData";
@@ -16,6 +16,8 @@ function searchBox() {
     );
     const [loading, setLoading] = useState(false);
     const [locationInfo, { data, error, isLoading }] = useLazyFetchSafetyDataQuery();
+    const [fetchLandMark, { data: AiLandMarks, error: AiLandMarksError }] =
+        useLazyFetchLandmarksQuery();
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
         locationInfo(destination);
@@ -42,8 +44,20 @@ function searchBox() {
     }, [data, error, isLoading]);
     const selectSafetyData = useSelector(selectsafetyData);
     useEffect(() => {
-        console.log("Safety data from Redux:", selectSafetyData);
+        if (selectSafetyData) {
+            fetchLandMark(selectSafetyData.location);
+        }
     }, [selectSafetyData]);
+    useEffect(() => {
+        if (AiLandMarks) {
+            dispatch({
+                type: "locationInformation/setLandmarks",
+                payload: {
+                    landmarks: AiLandMarks,
+                },
+            });
+        }
+    }, [AiLandMarks, AiLandMarksError]);
 
     return (
         <form onSubmit={handleSearch} className="flex w-full max-w-lg mx-auto mb-8 gap-2">
