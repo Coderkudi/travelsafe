@@ -116,6 +116,10 @@ Format the response as a JSON object with the following structure:
                         forecast: forcast,
                     };
                     jsonObject.safetyIndex = sumOfSafetyScore;
+                    jsonObject.coordinates = {
+                        lat: weather.coordinates.lat,
+                        lon: weather.coordinates.lon,
+                    };
 
                     return NextResponse.json(jsonObject, {
                         status: 200,

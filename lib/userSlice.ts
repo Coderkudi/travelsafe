@@ -1,41 +1,38 @@
-import {createSelector, createSlice} from "@reduxjs/toolkit";
+import { createSelector, createSlice } from "@reduxjs/toolkit";
 interface StateInterface {
-    userName: string | null;
-    email: string | null;
-    avatar_url: string | null;
+    location: {
+        name: string | null;
+        lat: number;
+        lon: number;
+    };
 }
 const initialState: StateInterface = {
-    userName: null,
-    email: null,
-    avatar_url: null,
+    location: {
+        name: null,
+        lat: 0,
+        lon: 0,
+    },
 };
-const userInformation = createSlice({
-    name: "current_user",
+const locationData = createSlice({
+    name: "locationInformation",
     initialState,
     reducers: {
-        setUserInfomation: (
+        setLocationInformation: (
             state: StateInterface,
-            action: {payload: Pick<StateInterface, "email" | "userName" | "avatar_url">},
+            action: {
+                payload: Pick<StateInterface, "location">;
+            },
         ) => {
-            const {userName, email, avatar_url} = action.payload;
-            state.userName = userName;
-            state.email = email;
-            state.avatar_url = avatar_url;
+            state.location = action.payload.location;
         },
     },
 });
 
-export const {setUserInfomation} = userInformation.actions;
+export const { setLocationInformation } = locationData.actions;
+export default locationData.reducer;
 
-export default userInformation.reducer;
-const selectCurrentUserState = (state: any) => state.userInformation;
-
-export const selectCurrentUser = createSelector(
-    [selectCurrentUserState],
-    userInformation => ({
-        userName: userInformation.userName,
-        email: userInformation.email,
-        avatar_url: userInformation.avatar_url,
-        name: userInformation.name,
-    }),
+export const selectLocationState = (state: any) => state.locationInformation;
+export const selectLocation = createSelector(
+    selectLocationState,
+    (state: StateInterface) => state.location,
 );

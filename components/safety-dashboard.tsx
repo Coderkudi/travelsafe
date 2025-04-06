@@ -27,17 +27,27 @@ import {
     MapPin,
     Shield,
 } from "lucide-react";
-import { toast } from "@/hooks/use-toast";
 import { useLazyFetchSafetyDataQuery } from "@/lib/user";
 import type { SafetyDataType } from "@/types/SafetyData";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useDispatch, useSelector } from "react-redux";
+import { selectLocationState } from "@/lib/userSlice";
 
 export default function SafetyDashboard() {
-    const [destination, setDestination] = useState("Paris, France");
+    const dispatch = useDispatch();
+    const locationInformationFromRedux = useSelector(selectLocationState);
+    const [destination, setDestination] = useState(
+        locationInformationFromRedux.location.name || "price,france",
+    );
     const [safetyData, setSafetyData] = useState<SafetyDataType>({
         location: "Paris, France",
+        coordinates: {
+            lat: locationInformationFromRedux.location.lat || 48.8566,
+            lon: locationInformationFromRedux.location.lon || 2.3522,
+        },
         crimeIndex: 42,
         safetyIndex: 58,
+
         travelAdvisory: "Exercise increased caution",
         advisoryLevel: 2,
         weather: {
@@ -82,19 +92,28 @@ export default function SafetyDashboard() {
 
     useEffect(() => {
         setLoading(isLoading);
-        console.log(data, error, isLoading);
-        
+
         try {
             if (data) {
                 // @ts-ignore
                 setSafetyData(data);
+                // console.log("Safety Data", data.location.split(","));
+
+                dispatch({
+                    type: "locationInformation/setLocationInformation",
+                    payload: {
+                        location: {
+                            name: data.location,
+                            lat: data?.coordinates.lat,
+                            lon: data?.coordinates.lon,
+                        },
+                    },
+                });
             }
         } catch (error) {
-            toast({
-                title: "Error fetching safety data",
-                description: "Please try again later or check your destination name.",
-                variant: "destructive",
-            });
+            if (error instanceof Error) {
+                console.log("Error fetching safety data", error.message);
+            }
         } finally {
             setLoading(isLoading);
         }

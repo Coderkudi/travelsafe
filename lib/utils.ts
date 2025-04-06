@@ -6,11 +6,11 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 import { GoogleGenerativeAI } from "@google/generative-ai";
+
 export const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
 
 export async function getWeather(location: string) {
     try {
-        console.log("Locaiton", location);
         const res = await fetch(
             `https://pro.openweathermap.org/data/2.5/weather?q=${location}&appid=${process.env.OPENWEATHER_API_KEY}&units=metric`,
         );
@@ -37,6 +37,7 @@ export async function getWeather(location: string) {
                 lon: json.coord.lon,
             },
         };
+        console.log("Weather", weather);
         return weather;
     } catch (err) {
         if (err instanceof Error) {

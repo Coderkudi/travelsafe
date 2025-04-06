@@ -19,6 +19,8 @@ const Map = dynamic(() => import("../../components/Map"), {
     ),
 });
 import { toast } from "@/hooks/use-toast";
+import { useSelector } from "react-redux";
+import { selectLocationState } from "@/lib/userSlice";
 
 // Default coordinates for Paris, France
 const DEFAULT_CENTER: [number, number] = [48.8566, 2.3522];
@@ -32,9 +34,20 @@ interface Landmark {
 }
 
 export default function SafetyMapPage() {
-    const [destination, setDestination] = useState("Paris, France");
+    const locationInformationFromRedux = useSelector(selectLocationState);
+    const [destination, setDestination] = useState(
+        locationInformationFromRedux.location.name || "paris,france",
+    );
     const [activeLayer, setActiveLayer] = useState("safety");
-    const [mapCenter, setMapCenter] = useState<[number, number]>(DEFAULT_CENTER);
+    const [mapCenter, setMapCenter] = useState<[number, number]>(
+        locationInformationFromRedux.location.lat !== 0 &&
+            locationInformationFromRedux.location.lon !== 0
+            ? [
+                  locationInformationFromRedux.location.lat,
+                  locationInformationFromRedux.location.lon,
+              ]
+            : DEFAULT_CENTER,
+    );
     const [zoom, setZoom] = useState(12);
     const [landmarks, setLandmarks] = useState<Landmark[]>([
         {
@@ -59,8 +72,6 @@ export default function SafetyMapPage() {
             description: "Scheduled demonstration on Saturday",
         },
     ]);
-
-    // No longer need mapLoaded state with dynamic import
 
     const handleSearch = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -254,10 +265,7 @@ export default function SafetyMapPage() {
                                         Leaflet: any,
                                     ) => (
                                         <>
-                                            <TileLayer
-                                                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                                                attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-                                            />
+                                            <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
 
                                             {getVisibleLandmarks().map((landmark) => (
                                                 <Marker

@@ -1,5 +1,9 @@
 export interface SafetyDataType {
     location: string;
+    coordinates: {
+        lat: number;
+        lon: number;
+    };
     crimeIndex: number;
     safetyIndex: number;
     travelAdvisory: string;
