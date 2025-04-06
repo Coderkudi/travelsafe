@@ -7,7 +7,7 @@ import { useLazyFetchLandmarksQuery, useLazyFetchSafetyDataQuery } from "@/lib/u
 import { useDispatch, useSelector } from "react-redux";
 import { selectLocationState, selectsafetyData } from "@/lib/userSlice";
 import { SafetyDataType } from "@/types/SafetyData";
-function searchBox() {
+function SearchBox() {
     const dispatch = useDispatch();
     const safetyDataFromRedux: SafetyDataType = useSelector(selectsafetyData);
 
@@ -20,11 +20,11 @@ function searchBox() {
         useLazyFetchLandmarksQuery();
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
+        setLoading(true);
         locationInfo(destination);
     };
     useEffect(() => {
         setLoading(isLoading);
-
         try {
             if (data) {
                 dispatch({
@@ -39,7 +39,7 @@ function searchBox() {
                 console.log("Error fetching safety data", error.message);
             }
         } finally {
-            setLoading(false);
+            setLoading(isLoading);
         }
     }, [data, error, isLoading]);
     const selectSafetyData = useSelector(selectsafetyData);
@@ -73,16 +73,26 @@ function searchBox() {
                     className="w-full bg-purple-950/60 border-purple-800 placeholder:text-purple-300/50 text-white"
                 />
             </div>
-            <Button
-                type="submit"
-                disabled={loading}
-                className="bg-purple-600 hover:bg-purple-700 text-white"
-            >
-                {loading ? "Loading..." : <Search className="h-4 w-4 mr-2" />}
-                Search
-            </Button>
+            {loading ? (
+                <Button
+                    type="submit"
+                    disabled={loading}
+                    className="bg-purple-600 hover:bg-purple-700 text-white"
+                >
+                    Loading
+                </Button>
+            ) : (
+                <Button
+                    type="submit"
+                    disabled={loading}
+                    className="bg-purple-600 hover:bg-purple-700 text-white"
+                >
+                    {<Search className="h-4 w-4 mr-2" />}
+                    Search
+                </Button>
+            )}
         </form>
     );
 }
 
-export default searchBox;
+export default SearchBox;
