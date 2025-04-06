@@ -10,7 +10,7 @@ export async function GET(
         if (location) {
             const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
             const prompt = `
-          Using accurate and up-to-date information, provide a detailed list of important landmarks near ${location}, categorized into:
+          Using accurate and up-to-date of Current Year information, provide a detailed list of important landmarks near ${location}, categorized into:
 
 1. Safety landmarks (e.g., police stations, fire departments)
 2. Medical facilities (e.g., hospitals, clinics)
