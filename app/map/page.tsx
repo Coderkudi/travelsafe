@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type React from "react";
 
 import { Card, CardContent } from "@/components/ui/card";
@@ -20,7 +20,9 @@ const Map = dynamic(() => import("../../components/Map"), {
 });
 import { toast } from "@/hooks/use-toast";
 import { useSelector } from "react-redux";
-import { selectLocationState } from "@/lib/userSlice";
+import { selectLocationState, selectsafetyData } from "@/lib/userSlice";
+import SearchBox from "@/components/ui/searchBox";
+import { SafetyDataType } from "@/types/SafetyData";
 
 // Default coordinates for Paris, France
 const DEFAULT_CENTER: [number, number] = [48.8566, 2.3522];
@@ -34,21 +36,20 @@ interface Landmark {
 }
 
 export default function SafetyMapPage() {
-    const locationInformationFromRedux = useSelector(selectLocationState);
+    const safetyDataFromRedux: SafetyDataType = useSelector(selectsafetyData);
+
     const [destination, setDestination] = useState(
-        locationInformationFromRedux.location.name || "paris,france",
+        safetyDataFromRedux.location || "paris,france",
     );
     const [activeLayer, setActiveLayer] = useState("safety");
     const [mapCenter, setMapCenter] = useState<[number, number]>(
-        locationInformationFromRedux.location.lat !== 0 &&
-            locationInformationFromRedux.location.lon !== 0
-            ? [
-                  locationInformationFromRedux.location.lat,
-                  locationInformationFromRedux.location.lon,
-              ]
+        safetyDataFromRedux.coordinates.lat !== 0 &&
+            safetyDataFromRedux.coordinates.lon !== 0
+            ? [safetyDataFromRedux.coordinates.lat, safetyDataFromRedux.coordinates.lon]
             : DEFAULT_CENTER,
     );
     const [zoom, setZoom] = useState(12);
+    const mapRef = useRef<any>(null);
     const [landmarks, setLandmarks] = useState<Landmark[]>([
         {
             id: "landmark-1",
@@ -72,6 +73,13 @@ export default function SafetyMapPage() {
             description: "Scheduled demonstration on Saturday",
         },
     ]);
+    useEffect(() => {
+        setDestination(safetyDataFromRedux.location);
+        setMapCenter([
+            safetyDataFromRedux.coordinates.lat,
+            safetyDataFromRedux.coordinates.lon,
+        ]);
+    }, [safetyDataFromRedux]);
 
     const handleSearch = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -215,6 +223,17 @@ export default function SafetyMapPage() {
         });
     };
 
+    useEffect(() => {
+        if (mapRef.current) {
+            mapRef.current = mapRef.current.leafletElement;
+        }
+    }, []);
+    useEffect(() => {
+        if (mapRef.current) {
+            mapRef.current.setView(mapCenter, zoom);
+        }
+    }, [mapCenter, zoom]);
+
     return (
         <div className="min-h-screen w-full bg-gradient-to-br from-[#1a0d2c] to-[#0f051a]">
             <div className="container mx-auto px-4 py-8 ">
@@ -228,25 +247,8 @@ export default function SafetyMapPage() {
                         </Button>
                     </div>
                 </div>
-                {/* search bar */}
-                <form onSubmit={handleSearch} className="flex gap-2 mt-10">
-                    <div className="flex-1">
-                        <Label htmlFor="map-destination" className="sr-only">
-                            Destination
-                        </Label>
-                        <Input
-                            id="map-destination"
-                            placeholder="Search location (try Paris, London, or New York)"
-                            value={destination}
-                            onChange={(e) => setDestination(e.target.value)}
-                            className="w-full"
-                        />
-                    </div>
-                    <Button type="submit">
-                        <Search className="h-4 w-4 mr-2" />
-                        Search
-                    </Button>
-                </form>
+
+                <SearchBox />
 
                 <div className="grid gap-6 lg:grid-cols-[1fr_300px] mt-6">
                     <Card className="overflow-hidden border-purple-900/50 bg-purple-950/30">
@@ -254,40 +256,42 @@ export default function SafetyMapPage() {
                             {/* map loading */}
                             <>
                                 <Map
-                                    className="w-full h-full"
-                                    width={800}
-                                    height={600}
                                     center={mapCenter}
                                     zoom={zoom}
+                                    height={600}
+                                    whenCreated={(mapInstance: any) =>
+                                        (mapRef.current = mapInstance)
+                                    }
                                 >
-                                    {(
-                                        { TileLayer, Marker, Popup, LayerGroup }: any,
-                                        Leaflet: any,
-                                    ) => (
-                                        <>
-                                            <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-
-                                            {getVisibleLandmarks().map((landmark) => (
-                                                <Marker
-                                                    key={landmark.id}
-                                                    position={landmark.location}
-                                                    icon={getMarkerIcon(
-                                                        landmark.type,
-                                                        Leaflet,
-                                                    )}
-                                                >
-                                                    <Popup>
-                                                        <div>
-                                                            <h3 className="font-bold">
-                                                                {landmark.name}
-                                                            </h3>
-                                                            <p>{landmark.description}</p>
-                                                        </div>
-                                                    </Popup>
-                                                </Marker>
-                                            ))}
-                                        </>
-                                    )}
+                                    {(ReactLeaflet: any, Leaflet: any) => {
+                                        const { TileLayer, Marker, Popup } = ReactLeaflet;
+                                        return (
+                                            <>
+                                                <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+                                                {getVisibleLandmarks().map((landmark) => (
+                                                    <Marker
+                                                        key={landmark.id}
+                                                        position={landmark.location}
+                                                        icon={getMarkerIcon(
+                                                            landmark.type,
+                                                            Leaflet,
+                                                        )}
+                                                    >
+                                                        <Popup>
+                                                            <div>
+                                                                <h3 className="font-bold">
+                                                                    {landmark.name}
+                                                                </h3>
+                                                                <p>
+                                                                    {landmark.description}
+                                                                </p>
+                                                            </div>
+                                                        </Popup>
+                                                    </Marker>
+                                                ))}
+                                            </>
+                                        );
+                                    }}
                                 </Map>
                                 {/* Map controls */}
                                 <div className="absolute bottom-4 right-4 sm:flex flex-col gap-2  hidden ">

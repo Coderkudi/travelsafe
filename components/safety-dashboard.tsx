@@ -31,93 +31,15 @@ import { useLazyFetchSafetyDataQuery } from "@/lib/user";
 import type { SafetyDataType } from "@/types/SafetyData";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useDispatch, useSelector } from "react-redux";
-import { selectLocationState } from "@/lib/userSlice";
+import { selectLocationState, selectsafetyData } from "@/lib/userSlice";
+import SearchBox from "./ui/searchBox";
 
 export default function SafetyDashboard() {
-    const dispatch = useDispatch();
-    const locationInformationFromRedux = useSelector(selectLocationState);
-    const [destination, setDestination] = useState(
-        locationInformationFromRedux.location.name || "price,france",
-    );
-    const [safetyData, setSafetyData] = useState<SafetyDataType>({
-        location: "Paris, France",
-        coordinates: {
-            lat: locationInformationFromRedux.location.lat || 48.8566,
-            lon: locationInformationFromRedux.location.lon || 2.3522,
-        },
-        crimeIndex: 42,
-        safetyIndex: 58,
-
-        travelAdvisory: "Exercise increased caution",
-        advisoryLevel: 2,
-        weather: {
-            condition: "Partly Cloudy",
-            temperature: 22,
-            forecast: "Mild conditions expected for the next 3 days",
-        },
-        healthAdvisories: [
-            "COVID-19: Masks recommended in crowded places",
-            "Seasonal flu activity is elevated",
-        ],
-        recentIncidents: [
-            {
-                type: "Theft",
-                location: "Tourist areas",
-                description: "Pickpocketing reported in popular tourist spots",
-            },
-            {
-                type: "Protest",
-                location: "City Center",
-                description: "Scheduled demonstration on Saturday",
-            },
-        ],
-        emergencyContacts: {
-            police: "17",
-            ambulance: "15",
-            fireService: "18",
-            emergencyHotline: "112",
-        },
-        nearbyHospitals: [
-            { name: "Hôpital Saint-Antoine", distance: "2.3 km" },
-            { name: "Hôpital Hôtel-Dieu", distance: "3.1 km" },
-        ],
-        aiGeneratedTips: "",
-    });
-    const [loading, setLoading] = useState(false);
-    const [locationInfo, { data, error, isLoading }] = useLazyFetchSafetyDataQuery();
-    const handleSearch = (e: React.FormEvent) => {
-        e.preventDefault();
-        locationInfo(destination);
-    };
-
+    const safetyDataFromRedux: SafetyDataType = useSelector(selectsafetyData);
+    const [safetyData, setSafetyData] = useState<SafetyDataType>(safetyDataFromRedux);
     useEffect(() => {
-        setLoading(isLoading);
-
-        try {
-            if (data) {
-                // @ts-ignore
-                setSafetyData(data);
-                // console.log("Safety Data", data.location.split(","));
-
-                dispatch({
-                    type: "locationInformation/setLocationInformation",
-                    payload: {
-                        location: {
-                            name: data.location,
-                            lat: data?.coordinates.lat,
-                            lon: data?.coordinates.lon,
-                        },
-                    },
-                });
-            }
-        } catch (error) {
-            if (error instanceof Error) {
-                console.log("Error fetching safety data", error.message);
-            }
-        } finally {
-            setLoading(isLoading);
-        }
-    }, [data, error, isLoading]);
+        setSafetyData(safetyDataFromRedux);
+    }, [safetyDataFromRedux]);
 
     const getSafetyColor = (index: number) => {
         if (index >= 80) return "text-green-400";
@@ -147,31 +69,7 @@ export default function SafetyDashboard() {
 
     return (
         <div className="w-full max-w-6xl mx-auto mt-8">
-            <form
-                onSubmit={handleSearch}
-                className="flex w-full max-w-lg mx-auto mb-8 gap-2"
-            >
-                <div className="flex-1">
-                    <Label htmlFor="destination" className="sr-only">
-                        Destination
-                    </Label>
-                    <Input
-                        id="destination"
-                        placeholder="Enter destination (city, country)"
-                        value={destination}
-                        onChange={(e) => setDestination(e.target.value)}
-                        className="w-full bg-purple-950/60 border-purple-800 placeholder:text-purple-300/50 text-white"
-                    />
-                </div>
-                <Button
-                    type="submit"
-                    disabled={loading}
-                    className="bg-purple-600 hover:bg-purple-700 text-white"
-                >
-                    {loading ? "Loading..." : <Search className="h-4 w-4 mr-2" />}
-                    Search
-                </Button>
-            </form>
+            <SearchBox />
 
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 mb-8">
                 <Card className="border-purple-900/50 bg-purple-950/30">

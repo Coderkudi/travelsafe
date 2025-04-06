@@ -5,18 +5,12 @@ import { ArrowRight, Globe, Shield, MapPin, Bell, User } from "lucide-react";
 import { Suspense } from "react";
 import SafetyDashboard from "@/components/safety-dashboard";
 import DashboardSkeleton from "@/components/dashboard-skeleton";
-import { useSelector } from "react-redux";
-import { selectLocationState } from "../lib/userSlice";
 
 export default function Home() {
-    const locationInformationFromRedux = useSelector(selectLocationState);
-    useEffect(() => {
-        console.log("From Redux.=> ", locationInformationFromRedux);
-    }, [locationInformationFromRedux]);
-
     return (
         <div className="min-h-screen w-full bg-gradient-to-br from-[#1a0d2c] to-[#0f051a]">
             {/* Header */}
+
             <header className="sticky top-0 z-50 w-full border-b border-purple-900/30 bg-purple-950/60 backdrop-blur supports-[backdrop-filter]:bg-purple-950/40">
                 <div className="container mx-auto flex h-16 items-center px-4">
                     <div className="flex items-center gap-2 font-bold text-xl text-white">
