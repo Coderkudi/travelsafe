@@ -29,12 +29,12 @@ export default function Home() {
                         >
                             Safety Map
                         </Link>
-                        <Link
+                        {/* <Link
                             href="/alerts"
                             className="text-sm font-medium text-white/80 hover:text-purple-300 transition-colors"
                         >
                             Alerts
-                        </Link>
+                        </Link> */}
                         <button className="flex items-center justify-center rounded-full bg-purple-900/30 p-2 text-white hover:bg-purple-800/50 transition-colors">
                             <User className="h-4 w-4" />
                         </button>
