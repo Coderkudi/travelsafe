@@ -36,7 +36,6 @@ function SearchBox() {
             }
         } catch (error) {
             if (error instanceof Error) {
-                console.log("Error fetching safety data", error.message);
             }
         } finally {
             setLoading(isLoading);

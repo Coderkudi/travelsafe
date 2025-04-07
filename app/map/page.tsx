@@ -17,16 +17,10 @@ const Map = dynamic(() => import("../../components/Map"), {
     ),
 });
 
-import { toast } from "@/hooks/use-toast";
 import { useSelector } from "react-redux";
-import {
-    selectAllLandMarks,
-    selectLocationState,
-    selectsafetyData,
-} from "@/lib/userSlice";
+import { selectAllLandMarks, selectsafetyData } from "@/lib/userSlice";
 import SearchBox from "@/components/ui/searchBox";
 import { Landmark, SafetyDataType } from "@/types/SafetyData";
-import { useLazyFetchLandmarksQuery } from "@/lib/user";
 
 // Default coordinates for Paris, France
 const DEFAULT_CENTER: [number, number] = [48.8566, 2.3522];
@@ -160,7 +154,6 @@ export default function SafetyMapPage() {
                 </div>
 
                 <SearchBox />
-
                 <div className="grid gap-6 lg:grid-cols-[1fr_300px] mt-6">
                     <Card className="overflow-hidden border-purple-900/50 bg-purple-950/30">
                         <div className="relative w-full h-[70vh]">

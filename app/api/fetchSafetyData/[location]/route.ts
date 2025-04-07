@@ -2,6 +2,7 @@ import { genAI, generateForecast, getWeather } from "@/lib/utils";
 import { safetyScore } from "@/types/SafetyData";
 import type { GenerateContentResult } from "@google/generative-ai";
 import { NextRequest, NextResponse } from "next/server";
+export const runtime = "edge";
 export async function GET(
     req: NextRequest,
     context: { params: Promise<{ location: string }> },
@@ -117,7 +118,7 @@ Format the response as a JSON object with the following structure:
                         lat: weather.coordinates.lat,
                         lon: weather.coordinates.lon,
                     };
-
+                    jsonObject.safetyScore = safetyData;
                     return NextResponse.json(jsonObject, {
                         status: 200,
                     });
@@ -202,7 +203,6 @@ async function getSafetyData(location: string) {
                     return safetyData;
                 } catch (error) {
                     if (error instanceof Error) {
-                        console.log(error.message);
                         return null;
                     }
                 }
@@ -210,7 +210,6 @@ async function getSafetyData(location: string) {
         }
     } catch (error) {
         if (error instanceof Error) {
-            console.log(error.message);
             return null;
         }
     }

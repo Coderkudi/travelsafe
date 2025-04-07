@@ -31,6 +31,7 @@ export interface SafetyDataType {
         distance: string;
     }[];
     aiGeneratedTips: string;
+    safetyScore?: safetyScore;
 }
 
 export interface safetyScore {

@@ -1,7 +1,5 @@
 "use client";
 
-import type React from "react";
-
 import { useState, useEffect } from "react";
 import {
     Card,
@@ -14,8 +12,6 @@ import {
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import {
     AlertTriangle,
@@ -23,16 +19,15 @@ import {
     AlertCircle,
     Hospital,
     Phone,
-    Search,
     MapPin,
     Shield,
 } from "lucide-react";
-import { useLazyFetchSafetyDataQuery } from "@/lib/user";
 import type { SafetyDataType } from "@/types/SafetyData";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useDispatch, useSelector } from "react-redux";
-import { selectLocationState, selectsafetyData } from "@/lib/userSlice";
+import { useSelector } from "react-redux";
+import { selectsafetyData } from "@/lib/userSlice";
 import SearchBox from "./ui/searchBox";
+import { SafetyScoreTooltip } from "./safety-score-tooltip";
 
 export default function SafetyDashboard() {
     const safetyDataFromRedux: SafetyDataType = useSelector(selectsafetyData);
@@ -83,50 +78,52 @@ export default function SafetyDashboard() {
                     </CardHeader>
 
                     <CardContent>
-                        <div className="flex items-center justify-center py-4">
-                            <div className="relative h-40 w-40">
-                                <svg className="h-full w-full" viewBox="0 0 100 100">
-                                    <circle
-                                        className="text-purple-800/40 stroke-current"
-                                        strokeWidth="10"
-                                        fill="transparent"
-                                        r="40"
-                                        cx="50"
-                                        cy="50"
-                                    />
-                                    <circle
-                                        className={`${getSafetyColor(
-                                            safetyData.safetyIndex,
-                                        )} stroke-current`}
-                                        strokeWidth="10"
-                                        strokeLinecap="round"
-                                        fill="transparent"
-                                        r="40"
-                                        cx="50"
-                                        cy="50"
-                                        strokeDasharray={`${
-                                            safetyData.safetyIndex * 2.51
-                                        } 251.2`}
-                                        strokeDashoffset="0"
-                                        transform="rotate(-90 50 50)"
-                                    />
-                                </svg>
-                                <div className="absolute inset-0 flex items-center justify-center">
-                                    <div className="text-center">
-                                        <p
-                                            className={`text-4xl font-bold ${getSafetyColor(
+                        <SafetyScoreTooltip>
+                            <div className="flex items-center justify-center py-4">
+                                <div className="relative h-40 w-40">
+                                    <svg className="h-full w-full" viewBox="0 0 100 100">
+                                        <circle
+                                            className="text-purple-800/40 stroke-current"
+                                            strokeWidth="10"
+                                            fill="transparent"
+                                            r="40"
+                                            cx="50"
+                                            cy="50"
+                                        />
+                                        <circle
+                                            className={`${getSafetyColor(
                                                 safetyData.safetyIndex,
-                                            )}`}
-                                        >
-                                            {safetyData.safetyIndex}
-                                        </p>
-                                        <p className="text-sm text-purple-300/70">
-                                            out of 100
-                                        </p>
+                                            )} stroke-current`}
+                                            strokeWidth="10"
+                                            strokeLinecap="round"
+                                            fill="transparent"
+                                            r="40"
+                                            cx="50"
+                                            cy="50"
+                                            strokeDasharray={`${
+                                                safetyData.safetyIndex * 2.51
+                                            } 251.2`}
+                                            strokeDashoffset="0"
+                                            transform="rotate(-90 50 50)"
+                                        />
+                                    </svg>
+                                    <div className="absolute inset-0 flex items-center justify-center">
+                                        <div className="text-center">
+                                            <p
+                                                className={`text-4xl font-bold ${getSafetyColor(
+                                                    safetyData.safetyIndex,
+                                                )}`}
+                                            >
+                                                {safetyData.safetyIndex}
+                                            </p>
+                                            <p className="text-sm text-purple-300/70">
+                                                out of 100
+                                            </p>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </SafetyScoreTooltip>
                     </CardContent>
                     <CardFooter>
                         <Badge

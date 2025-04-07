@@ -79,7 +79,6 @@ const locationData = createSlice({
                 payload: Pick<StateInterface, "landmarks">;
             },
         ) => {
-            console.log("landmarks", action.payload.landmarks);
             state.landmarks = action.payload.landmarks;
         },
     },
@@ -101,4 +100,8 @@ export const selectsafetyData = createSelector(
 export const selectAllLandMarks = createSelector(
     selectLocationState,
     (state: StateInterface) => state.landmarks,
+);
+export const selectsafetyScore = createSelector(
+    selectLocationState,
+    (state: StateInterface) => state.safetyData.safetyScore,
 );

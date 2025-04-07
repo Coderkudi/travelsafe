@@ -1,5 +1,4 @@
 "use client";
-import React, { useEffect } from "react";
 import Link from "next/link";
 import { ArrowRight, Globe, Shield, MapPin, Bell, User } from "lucide-react";
 import { Suspense } from "react";
@@ -17,7 +16,7 @@ export default function Home() {
                         <Shield className="h-6 w-6 text-purple-400" />
                         <span>TravelSafe</span>
                     </div>
-                    <nav className="ml-auto flex gap-6">
+                    <nav className="ml-auto flex gap-6 items-center">
                         <Link
                             href="/"
                             className="text-sm font-medium text-white hover:text-purple-300 transition-colors"
@@ -44,8 +43,8 @@ export default function Home() {
             </header>
 
             {/* Hero Section */}
-            <main className="container mx-auto px-4 py-16">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <main className="container mx-auto px-4 flex flex-col justify-center min-h-[80vh] my-16">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mx-auto">
                     <div className="space-y-6">
                         <h1 className="text-4xl font-bold tracking-tight text-white sm:text-5xl">
                             Travel with confidence around the world
@@ -61,15 +60,15 @@ export default function Home() {
                             >
                                 Explore Safety Map <ArrowRight className="ml-2 h-4 w-4" />
                             </Link>
-                            <Link
+                            {/* <Link
                                 href="/alerts"
                                 className="inline-flex h-10 items-center justify-center rounded-md border border-purple-800 bg-transparent px-8 text-sm font-medium text-purple-200 shadow-sm transition-colors hover:bg-purple-900/30 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-purple-400"
                             >
                                 View Alerts
-                            </Link>
+                            </Link> */}
                         </div>
                     </div>
-                    <div className="flex justify-center">
+                    <div className="flex justify-center ">
                         <div className="relative h-64 w-64 lg:h-80 lg:w-80">
                             <div
                                 className="absolute inset-0 rounded-full bg-purple-700/20 animate-pulse"

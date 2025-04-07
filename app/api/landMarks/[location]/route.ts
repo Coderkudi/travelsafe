@@ -1,6 +1,7 @@
 import { genAI } from "@/lib/utils";
 import { NextRequest, NextResponse } from "next/server";
 
+export const runtime = "edge";
 export async function GET(
     req: NextRequest,
     context: { params: Promise<{ location: string }> },
@@ -41,7 +42,6 @@ Only return the JSON, with no explanation or markdown formatting. Ensure locatio
         }
     } catch (err) {
         if (err instanceof Error) {
-            console.log(err.message);
             return NextResponse.json({ error: err.message }, { status: 500 });
         }
     }

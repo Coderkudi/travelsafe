@@ -41,7 +41,6 @@ export async function getWeather(location: string) {
         return weather;
     } catch (err) {
         if (err instanceof Error) {
-            console.log(err.message);
             return null;
         }
     }
