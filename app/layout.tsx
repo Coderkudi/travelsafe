@@ -30,8 +30,19 @@ export default function RootLayout({
                 className={`${geistSans.variable} ${geistMono.variable} antialiased text-white bg-gradient-to-br from-[#1a0d2c] to-[#0f051a]`}
                 suppressHydrationWarning
             >
-                {/* <Provider store={store}>{children}</Provider> */}
-                <StoreProvider>{children}</StoreProvider>
+                <StoreProvider>
+                    {children}
+                    
+                    <div className="footer flex items-center justify-evenly py-4  w-full bg-gradient-to-br from-[#1a0d2c] to-[#0f051a]">
+                        <p className="text-center font-semibold text-lg">
+                            Ravi Kumar (12314252)
+                        </p>
+                        <p className="text-center font-semibold text-lg">
+                            Aditya Ashok Singh (12315559)
+                        </p>
+                            {/* Ravi Kumar (12314252) */}
+                    </div>
+                </StoreProvider>
             </body>
         </html>
     );
