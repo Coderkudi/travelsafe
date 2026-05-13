@@ -4,8 +4,9 @@ import type React from "react";
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Search, Layers, AlertTriangle, Hospital, Shield } from "lucide-react";
+import { Layers, AlertTriangle, Hospital, Shield, Home } from "lucide-react";
 import dynamic from "next/dynamic";
+import Link from "next/link";
 
 // Import the Map component with dynamic import to avoid SSR issues with Leaflet
 const Map = dynamic(() => import("../../components/Map"), {
@@ -146,10 +147,12 @@ export default function SafetyMapPage() {
                 <div className="flex flex-col gap-6">
                     <div className="flex items-center justify-between">
                         <h1 className="text-3xl font-bold">Safety Map</h1>
-                        <Button variant="outline" size="sm" className="gap-1">
-                            <Shield className="h-4 w-4 text-purple-400" />
-                            Download Offline Map
-                        </Button>
+                        <Link href="/">
+                            <Button variant="outline" size="sm" className="gap-1">
+                                <Home className="h-4 w-4 text-purple-400" />
+                                Back to Home
+                            </Button>
+                        </Link>
                     </div>
                 </div>
 

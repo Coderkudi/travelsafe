@@ -218,13 +218,16 @@
 //     }
 // }
 
-import { createXai } from "@ai-sdk/xai";
-import { generateText } from "ai";
+import Groq from "groq-sdk";
 import { generateForecast, getWeather } from "@/lib/utils";
 import { safetyScore } from "@/types/SafetyData";
 import { NextRequest, NextResponse } from "next/server";
 
-const xai = createXai({ apiKey: process.env.XAI_API_KEY });
+function getGroqClient() {
+    const apiKey = process.env.GROQ_API_KEY;
+    if (!apiKey) return null;
+    return new Groq({ apiKey });
+}
 
 // export const runtime = "edge";
 export async function GET(
@@ -232,20 +235,30 @@ export async function GET(
     context: { params: Promise<{ location: string }> },
 ) {
     try {
+        const groq = getGroqClient();
+        if (!groq) {
+            return NextResponse.json(
+                { error: "Missing GROQ_API_KEY environment variable." },
+                { status: 500 },
+            );
+        }
+
         const { location } = await context.params;
         if (location) {
             const prompt = `
-            Please provide realtime comprehensive safety and travel information for ${location}. Include:
-1. Safety metrics (crime index and safety index on a scale of 0-100)
-2. Current travel advisory status and level (1-4)
-3. Weather conditions and forecast
-4. Active health advisories
-5. Recent security incidents (theft, protests, etc.)
-6. Emergency contact numbers
-7. Nearby medical facilities
-8. Local safety tips
+Provide a comprehensive safety and travel briefing for ${location} based on your best knowledge of the region.
 
-Format the response as a JSON object with the following structure:
+Include:
+1. Safety metrics (crimeIndex and safetyIndex, each as a number 0-100; estimate from typical city profile)
+2. Travel advisory status and level (1-4) — provide a plausible level based on general country/region conditions
+3. Weather conditions and short forecast (general seasonal pattern for the location)
+4. Health advisories (common ones for the region, e.g. mosquito-borne illness, air quality, water safety)
+5. Recent or typical security incidents (theft, scams, protests, common crimes for the area)
+6. Emergency contact numbers (use the country's standard emergency numbers)
+7. Nearby medical facilities (real or plausible hospital names in the area with realistic distances)
+8. Local safety tips relevant to the location
+
+Return the response as a single valid JSON object with this exact structure:
 {
   "location": string,
   "crimeIndex": number,
@@ -259,11 +272,7 @@ Format the response as a JSON object with the following structure:
   },
   "healthAdvisories": string[],
   "recentIncidents": [
-    {
-      "type": string,
-      "location": string,
-      "description": string
-    }
+    { "type": string, "location": string, "description": string }
   ],
   "emergencyContacts": {
     "police": string,
@@ -272,14 +281,18 @@ Format the response as a JSON object with the following structure:
     "emergencyHotline": string
   },
   "nearbyHospitals": [
-    {
-      "name": string,
-      "distance": string
-    }
+    { "name": string, "distance": string }
   ],
   "aiGeneratedTips": string
 }
-  Note: All news and weather condition should be realtime only`;
+
+STRICT RULES:
+- Every field MUST be populated with a meaningful value.
+- NEVER use null, "N/A", "Data not available", "Unknown", or empty arrays.
+- If you don't have exact real-time data, provide your best estimate based on general knowledge of the location.
+- Numbers must be actual numbers (not strings or null).
+- Provide at least 2 healthAdvisories, 2 recentIncidents, and 2 nearbyHospitals.
+- Return only the JSON object, no markdown, no commentary.`;
 
             const safetyData = await getSafetyData(location);
             if (!safetyData) {
@@ -316,11 +329,26 @@ Format the response as a JSON object with the following structure:
                     safetyData?.techSafety.techSupport;
             }
 
-            const { text } = await generateText({
-                model: xai.responses("grok-4.3"),
-                system: "You are a helpful AI assistant that provides accurate, real-time safety and travel information. Always respond with valid JSON only.",
-                prompt,
+            const completion = await groq.chat.completions.create({
+                model: "llama-3.3-70b-versatile",
+                messages: [
+                    {
+                        role: "system",
+                        content:
+                            "You are an expert travel safety analyst. You ALWAYS provide concrete, plausible answers based on your knowledge of world cities and regions — never refuse, never say data is unavailable, never use null. Output strictly a single valid JSON object. No markdown. No commentary.",
+                    },
+                    {
+                        role: "user",
+                        content: prompt,
+                    },
+                ],
+                temperature: 0.4,
+                response_format: { type: "json_object" },
             });
+
+            const text = completion.choices[0]?.message?.content || "";
+            console.log("=== GROQ API RESPONSE (fetchSafetyData) ===");
+            console.log(text);
 
             const weather = await getWeather(location);
 
@@ -376,61 +404,74 @@ Format the response as a JSON object with the following structure:
 
 async function getSafetyData(location: string) {
     try {
+        const groq = getGroqClient();
+        if (!groq) return null;
         if (location) {
             const prompt = `
-            please provide a comprehensive safety score for ${location}. Include:
-            1. Public Safety
-            2. Health Safety
-            3. Nature Risk
-            4. Culture and Legal Awareness
-            5. Tech Safety
-            Each category should be rated on a scale of 0-4, where 0 is very poor and 4 is excellent and all data should be relevant to the current date.
-    
-            Format the response as a JSON object with the following structure:
-            {
-        publicSafety: {
-            crimeRate: number out of 4;
-            emergencyResponse: number out of 4; 
-            policePresence: number out of 4;
-            NeighborhoodSafety: number out of 4;
-            NighttimeSafety: number out of 4;
-        };
-        healthSafety: {
-            airQuality: number out of 4;
-            waterQuality: number out of 4;
-            foodHygiene: number out of 4;
-            accessToHealthcare: number out of 4;;
-            diseasePrevalence: number out of 4;;
-        };
-        natureRisk: {
-            naturalDisasters: number out of 4;
-            wildlifeEncounters: number out of 4;;
-            environmentalHazards: number out of 4;;
-            climateChangeImpact: number out of 4;;
-            uvIndex: number out of 4;
-        };
-        CultureAndLegalAwareness: {
-            lawsAndRegulations: number out of 4;
-            culturalNorms: number out of 4;
-            localCustoms: number out of 4;
-            languageBarrier: number out of 4;
-            legalAssistance: number out of 4;
-        };
-        techSafety: {
-            dataPrivacy: number out of 4;
-            cyberSecurity: number out of 4;;
-            digitalFraud: number out of 4;;
-            onlineHarassment: number out of 4;;
-            techSupport: number out of 4;
-        };
-    } `;
+Provide a comprehensive safety score for ${location} based on your knowledge of the region.
+Rate each metric on an integer scale 0-4 (0 = very poor, 4 = excellent).
 
-            const { text } = await generateText({
-                model: xai.responses("grok-4.3"),
-                system: "You are a helpful AI assistant that provides accurate safety scores for locations. Always respond with valid JSON only.",
-                prompt,
+Return ONLY a single valid JSON object with this exact structure (no comments, no trailing text):
+{
+  "publicSafety": {
+    "crimeRate": number,
+    "emergencyResponse": number,
+    "policePresence": number,
+    "NeighborhoodSafety": number,
+    "NighttimeSafety": number
+  },
+  "healthSafety": {
+    "airQuality": number,
+    "waterQuality": number,
+    "foodHygiene": number,
+    "accessToHealthcare": number,
+    "diseasePrevalence": number
+  },
+  "natureRisk": {
+    "naturalDisasters": number,
+    "wildlifeEncounters": number,
+    "environmentalHazards": number,
+    "climateChangeImpact": number,
+    "uvIndex": number
+  },
+  "CultureAndLegalAwareness": {
+    "lawsAndRegulations": number,
+    "culturalNorms": number,
+    "localCustoms": number,
+    "languageBarrier": number,
+    "legalAssistance": number
+  },
+  "techSafety": {
+    "dataPrivacy": number,
+    "cyberSecurity": number,
+    "digitalFraud": number,
+    "onlineHarassment": number,
+    "techSupport": number
+  }
+}
+
+STRICT RULES:
+- Every field must be an integer 0-4. NEVER null, NEVER strings.
+- Always provide your best assessment based on general knowledge of the location — do not refuse.`;
+
+            const completion = await groq.chat.completions.create({
+                model: "llama-3.3-70b-versatile",
+                messages: [
+                    {
+                        role: "system",
+                        content:
+                            "You are an expert travel safety analyst. You ALWAYS provide concrete numeric safety scores 0-4 for any location based on your knowledge. Never refuse, never use null. Output only a single valid JSON object.",
+                    },
+                    {
+                        role: "user",
+                        content: prompt,
+                    },
+                ],
+                temperature: 0.4,
+                response_format: { type: "json_object" },
             });
 
+            const text = completion.choices[0]?.message?.content || "";
             const jsonMatch = text.match(/\{[\s\S]*\}/);
             const jsonString = jsonMatch ? jsonMatch[0] : null;
             let safetyData: safetyScore;
