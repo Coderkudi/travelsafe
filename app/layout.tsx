@@ -35,12 +35,12 @@ export default function RootLayout({
                     
                     <div className="footer flex items-center justify-evenly py-4  w-full bg-gradient-to-br from-[#1a0d2c] to-[#0f051a]">
                         <p className="text-center font-semibold text-lg">
-                            Ravi Kumar (12314252)
+                            Rimmi Goyal (12300916)
                         </p>
-                        <p className="text-center font-semibold text-lg">
+                        {/* <p className="text-center font-semibold text-lg">
                             Aditya Ashok Singh (12315559)
-                        </p>
-                            {/* Ravi Kumar (12314252) */}
+                        </p> */}
+                            {/* Rimmi Goyal (12300916) */}
                     </div>
                 </StoreProvider>
             </body>
